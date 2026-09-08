@@ -9,7 +9,12 @@ import {
 } from 'react-native';
 
 import { signOut } from '../../services/auth';
-import { getCurrentCollector } from '../../services/collector';
+import {
+  getCurrentCollector,
+  getCollectorStats,
+} from '../../services/collector';
+
+
 
 type Collector = {
   id: string;
@@ -29,32 +34,43 @@ export default function DashboardScreen() {
   const [error, setError] =
     useState<string | null>(null);
 
+    const [stats, setStats] = useState({
+        collections: 0,
+        totalWeight: 0,
+        totalEstimatedValue: 0,
+    });
+
   useEffect(() => {
     loadCollector();
   }, []);
 
   async function loadCollector() {
-    try {
-      setLoading(true);
-      setError(null);
+  try {
+    setLoading(true);
+    setError(null);
 
-      const data = await getCurrentCollector();
+    const [collectorData, statsData] =
+      await Promise.all([
+        getCurrentCollector(),
+        getCollectorStats(),
+      ]);
 
-      setCollector(data);
-    } catch (err: any) {
-      console.error(
-        'Failed to load collector:',
-        err
-      );
+    setCollector(collectorData);
+    setStats(statsData);
+  } catch (err: any) {
+    console.error(
+      'Failed to load collector:',
+      err
+    );
 
-      setError(
-        err?.message ||
-          'Unable to load collector information.'
-      );
-    } finally {
-      setLoading(false);
-    }
+    setError(
+      err?.message ||
+        'Unable to load collector information.'
+    );
+  } finally {
+    setLoading(false);
   }
+}
 
   async function handleLogout() {
     try {
@@ -135,17 +151,17 @@ export default function DashboardScreen() {
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
-            0
+            {stats.collections}
           </Text>
 
-          <Text style={styles.statLabel}>
-            Collections
-          </Text>
+            <Text style={styles.statLabel}>
+                Collections
+            </Text>
         </View>
 
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>
-            0 kg
+            {stats.totalWeight.toFixed(2)} kg
           </Text>
 
           <Text style={styles.statLabel}>
