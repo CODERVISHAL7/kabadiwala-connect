@@ -11,6 +11,7 @@ import CollectionReviewScreen from '../screens/CollectionReviewScreen';
 import ConfirmCollectionScreen from '../screens/ConfirmCollectionScreen';
 import CollectionSuccessScreen from '../screens/CollectionSuccessScreen';
 import CollectionHistoryScreen from '../screens/CollectionHistoryScreen';
+import CollectionDetailScreen from '../screens/CollectionDetailScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -83,6 +84,15 @@ export default function AppNavigator({
     title: 'My Collections',
   }}
 />
+
+    <Stack.Screen
+  name="CollectionDetail"
+  component={CollectionDetailScreen}
+  options={{
+    title: 'Collection Details',
+  }}
+/>
+
   </>
 ) : (
         <>

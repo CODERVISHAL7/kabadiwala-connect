@@ -132,77 +132,86 @@ export default function CollectionHistoryScreen({
       ) : (
         <View style={styles.list}>
           {collections.map((collection) => (
-            <View
-              key={collection.id}
-              style={styles.card}
-            >
-              <View style={styles.cardHeader}>
-                <Text style={styles.lotCode}>
-                  {collection.lot_code}
-                </Text>
+  <Pressable
+    key={collection.id}
+    style={styles.card}
+    onPress={() =>
+      navigation.navigate('CollectionDetail', {
+        collectionId: collection.id,
+      })
+    }
+  >
+    <View style={styles.cardHeader}>
+      <Text style={styles.lotCode}>
+        {collection.lot_code}
+      </Text>
 
-                <View style={styles.status}>
-                  <Text style={styles.statusText}>
-                    {collection.status}
-                  </Text>
-                </View>
-              </View>
+      <View style={styles.status}>
+        <Text style={styles.statusText}>
+          {collection.status}
+        </Text>
+      </View>
+    </View>
 
-              <Text style={styles.material}>
-                {collection.material?.name ||
-                  'Unknown Material'}
-              </Text>
+    <Text style={styles.material}>
+      {collection.material?.name ||
+        'Unknown Material'}
+    </Text>
 
-              {collection.material?.category && (
-                <Text style={styles.category}>
-                  {collection.material.category}
-                  {collection.material.subcategory
-                    ? ` • ${collection.material.subcategory}`
-                    : ''}
-                </Text>
-              )}
+    {collection.material?.category && (
+      <Text style={styles.category}>
+        {collection.material.category}
+        {collection.material.subcategory
+          ? ` • ${collection.material.subcategory}`
+          : ''}
+      </Text>
+    )}
 
-              <View style={styles.row}>
-                <View>
-                  <Text style={styles.label}>
-                    Weight
-                  </Text>
+    <View style={styles.row}>
+      <View>
+        <Text style={styles.label}>
+          Weight
+        </Text>
 
-                  <Text style={styles.value}>
-                    {collection.approx_weight}{' '}
-                    {collection.weight_unit}
-                  </Text>
-                </View>
+        <Text style={styles.value}>
+          {collection.approx_weight}{' '}
+          {collection.weight_unit}
+        </Text>
+      </View>
 
-                <View>
-                  <Text style={styles.label}>
-                    Estimated Value
-                  </Text>
+      <View>
+        <Text style={styles.label}>
+          Estimated Value
+        </Text>
 
-                  <Text style={styles.value}>
-                    {collection.currency === 'INR'
-                      ? '₹'
-                      : `${collection.currency} `}
-                    {Number(
-                      collection.estimated_value
-                    ).toFixed(2)}
-                  </Text>
-                </View>
-              </View>
+        <Text style={styles.value}>
+          {collection.currency === 'INR'
+            ? '₹'
+            : `${collection.currency} `}
+          {Number(
+            collection.estimated_value
+          ).toFixed(2)}
+        </Text>
+      </View>
+    </View>
 
-              {collection.collection_address && (
-                <Text style={styles.location}>
-                  📍 {collection.collection_address}
-                </Text>
-              )}
+    {collection.collection_address && (
+      <Text style={styles.location}>
+        📍 {collection.collection_address}
+      </Text>
+    )}
 
-              <Text style={styles.date}>
-                {new Date(
-                  collection.created_at
-                ).toLocaleString()}
-              </Text>
-            </View>
-          ))}
+    <Text style={styles.date}>
+      {new Date(
+        collection.created_at
+      ).toLocaleString()}
+    </Text>
+
+    <Text style={styles.viewDetails}>
+      View Details →
+    </Text>
+  </Pressable>
+))}
         </View>
       )}
     </ScrollView>
@@ -352,4 +361,10 @@ const styles = StyleSheet.create({
   errorText: {
     color: '#b00020',
   },
+  
+  viewDetails: {
+  marginTop: 14,
+  fontSize: 13,
+  fontWeight: '600',
+},
 });

@@ -1,11 +1,8 @@
 SELECT
-    lot_code,
-    approx_weight,
-    weight_unit,
-    estimated_value,
-    currency,
-    status,
-    created_at
-FROM public.material_lots
-ORDER BY created_at DESC
-LIMIT 5;
+    column_name,
+    data_type,
+    is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public'
+  AND table_name = 'material_lots'
+ORDER BY ordinal_position;

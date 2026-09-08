@@ -77,3 +77,83 @@ export async function getMyCollections(): Promise<
 
   return (data ?? []) as CollectionHistoryItem[];
 }
+
+export async function getCollectionById(
+  collectionId: string
+) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    throw userError;
+  }
+
+  if (!user) {
+    throw new Error('You must be logged in.');
+  }
+
+  // Find current collector
+  const {
+    data: collector,
+    error: collectorError,
+  } = await supabase
+    .from('collectors')
+    .select('id')
+    .eq('profile_id', user.id)
+    .maybeSingle();
+
+  if (collectorError) {
+    throw collectorError;
+  }
+
+  if (!collector) {
+    throw new Error('Collector profile not found.');
+  }
+
+  // Fetch only this collector's lot
+  const {
+    data,
+    error,
+  } = await supabase
+    .from('material_lots')
+    .select(`
+      id,
+      lot_code,
+      collector_id,
+      material_id,
+      description,
+      approx_weight,
+      weight_unit,
+      condition,
+      source_type,
+      collection_location,
+      collection_address,
+      estimated_value,
+      currency,
+      status,
+      created_at,
+      updated_at,
+      material:materials (
+        name,
+        category,
+        subcategory
+      )
+    `)
+    .eq('id', collectionId)
+    .eq('collector_id', collector.id)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    throw new Error(
+      'Collection not found or access denied.'
+    );
+  }
+
+  return data;
+}
