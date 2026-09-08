@@ -8,6 +8,8 @@ import DashboardScreen from '../screens/DashboardScreen';
 import NewCollectionScreen from '../screens/NewCollectionScreen';
 import CollectionDetailsScreen from '../screens/CollectionDetailsScreen';
 import CollectionReviewScreen from '../screens/CollectionReviewScreen';
+import ConfirmCollectionScreen from '../screens/ConfirmCollectionScreen';
+import CollectionSuccessScreen from '../screens/CollectionSuccessScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -56,6 +58,22 @@ export default function AppNavigator({
     title: 'Review Collection',
   }}
 />
+
+  <Stack.Screen
+            name="ConfirmCollection"
+            component={ConfirmCollectionScreen}
+            options={{
+                title: 'Confirm Collection',
+            }}
+        />
+
+        <Stack.Screen
+  name="CollectionSuccess"
+  component={CollectionSuccessScreen}
+  options={{
+    title: 'Collection Successful',
+  }}
+/>
   </>
 ) : (
         <>
@@ -74,6 +92,8 @@ export default function AppNavigator({
               title: 'Create Account',
             }}
           />
+
+          
         </>
       )}
     </Stack.Navigator>
