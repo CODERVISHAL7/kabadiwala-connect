@@ -154,12 +154,18 @@ const styles = StyleSheet.create({
   },
 
   secondaryButton: {
-    paddingVertical: 15,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#218c54',
-    alignItems: 'center',
-  },
+  marginTop: 12,
+  paddingVertical: 14,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: '#218c54',
+  alignItems: 'center',
+},
+
+secondaryButtonText: {
+  fontSize: 15,
+  fontWeight: '600',
+},
 
   secondaryText: {
     fontSize: 16,

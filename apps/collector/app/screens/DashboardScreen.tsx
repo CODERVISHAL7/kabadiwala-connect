@@ -178,13 +178,14 @@ export default function DashboardScreen({
       >
         <Text style={styles.primaryButtonText}>
           + New Collection
-          
         </Text>
-        
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.secondaryButton}
+        onPress={() =>
+          navigation.navigate('CollectionHistory')
+  }
       >
         <Text style={styles.secondaryButtonText}>
           Collection History
