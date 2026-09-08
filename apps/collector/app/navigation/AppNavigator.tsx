@@ -6,6 +6,8 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import NewCollectionScreen from '../screens/NewCollectionScreen';
+import CollectionDetailsScreen from '../screens/CollectionDetailsScreen';
+import CollectionReviewScreen from '../screens/CollectionReviewScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,6 +41,21 @@ export default function AppNavigator({
         title: 'New Collection',
       }}
     />
+
+    <Stack.Screen
+  name="CollectionDetails"
+  component={CollectionDetailsScreen}
+  options={{
+    title: 'Collection Details',
+  }}
+/>
+  <Stack.Screen
+  name="CollectionReview"
+  component={CollectionReviewScreen}
+  options={{
+    title: 'Review Collection',
+  }}
+/>
   </>
 ) : (
         <>
