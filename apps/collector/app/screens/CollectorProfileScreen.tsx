@@ -14,6 +14,8 @@ import {
   getCollectorStats,
 } from '../../services/collector';
 
+import { signOut } from '../../services/auth';
+
 export default function CollectorProfileScreen({
   navigation,
 }: any) {
@@ -30,8 +32,31 @@ export default function CollectorProfileScreen({
   const [loading, setLoading] =
     useState(true);
 
+    const [loggingOut, setLoggingOut] =
+         useState(false);
+
   const [error, setError] =
     useState<string | null>(null);
+
+    async function handleLogout() {
+  try {
+    setLoggingOut(true);
+
+    await signOut();
+  } catch (err: any) {
+    console.error(
+      'Logout failed:',
+      err
+    );
+
+    setError(
+      err?.message ||
+        'Unable to logout.'
+    );
+  } finally {
+    setLoggingOut(false);
+  }
+}
 
   const loadProfile = useCallback(async () => {
     try {
@@ -200,9 +225,22 @@ export default function CollectorProfileScreen({
           Back to Dashboard
         </Text>
       </Pressable>
+
+      <Pressable
+  style={styles.logoutButton}
+  onPress={handleLogout}
+  disabled={loggingOut}
+>
+  <Text style={styles.logoutText}>
+    {loggingOut ? 'Logging out...' : 'Logout'}
+  </Text>
+</Pressable>
     </ScrollView>
   );
 }
+
+
+
 
 function InfoRow({
   label,
@@ -352,4 +390,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+
+  logoutButton: {
+  marginTop: 12,
+  borderWidth: 1,
+  borderColor: '#d32f2f',
+  paddingVertical: 15,
+  borderRadius: 8,
+  alignItems: 'center',
+},
+
+logoutText: {
+  color: '#d32f2f',
+  fontSize: 16,
+  fontWeight: '700',
+},
 });
