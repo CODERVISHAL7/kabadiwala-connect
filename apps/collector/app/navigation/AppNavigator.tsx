@@ -13,6 +13,7 @@ import CollectionSuccessScreen from '../screens/CollectionSuccessScreen';
 import CollectionHistoryScreen from '../screens/CollectionHistoryScreen';
 import CollectionDetailScreen from '../screens/CollectionDetailScreen';
 import CollectorProfileScreen from '../screens/CollectorProfileScreen';
+import EditCollectorProfileScreen from '../screens/EditCollectorProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -48,18 +49,18 @@ export default function AppNavigator({
     />
 
     <Stack.Screen
-  name="CollectionDetails"
-  component={CollectionDetailsScreen}
-  options={{
-    title: 'Collection Details',
-  }}
+      name="CollectionDetails"
+      component={CollectionDetailsScreen}
+      options={{
+        title: 'Collection Details',
+      }}
 />
-  <Stack.Screen
-  name="CollectionReview"
-  component={CollectionReviewScreen}
-  options={{
-    title: 'Review Collection',
-  }}
+    <Stack.Screen
+    name="CollectionReview"
+    component={CollectionReviewScreen}
+    options={{
+      title: 'Review Collection',
+    }}
 />
 
   <Stack.Screen
@@ -99,6 +100,14 @@ export default function AppNavigator({
   component={CollectorProfileScreen}
   options={{
     title: 'My Profile',
+  }}
+/>
+
+<Stack.Screen
+  name="EditCollectorProfile"
+  component={EditCollectorProfileScreen}
+  options={{
+    title: 'Edit Profile',
   }}
 />
 

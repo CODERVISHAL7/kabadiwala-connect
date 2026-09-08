@@ -24,10 +24,62 @@ export async function getCurrentCollector() {
       profile_id,
       collector_code,
       general_location,
+      general_location_text,
       created_at,
       updated_at
     `)
     .eq('profile_id', user.id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function updateCollectorProfile(
+  generalLocation: string
+) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    throw userError;
+  }
+
+  if (!user) {
+    throw new Error('No authenticated user found.');
+  }
+
+  const location = generalLocation.trim();
+
+  if (!location) {
+    throw new Error(
+      'General location cannot be empty.'
+    );
+  }
+
+  const {
+    data,
+    error,
+  } = await supabase
+    .from('collectors')
+    .update({
+      general_location_text: location,
+    })
+    .eq('profile_id', user.id)
+    .select(`
+      id,
+      profile_id,
+      collector_code,
+      general_location,
+      general_location_text,
+      created_at,
+      updated_at
+    `)
     .single();
 
   if (error) {
@@ -99,4 +151,50 @@ export async function getCollectorStats() {
     totalWeight,
     totalEstimatedValue,
   };
+}
+
+export async function updateCollectorGPSLocation(
+  latitude: number,
+  longitude: number
+) {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    throw userError;
+  }
+
+  if (!user) {
+    throw new Error('No authenticated user found.');
+  }
+
+  const point = `POINT(${longitude} ${latitude})`;
+
+  const {
+    data,
+    error,
+  } = await supabase
+    .from('collectors')
+    .update({
+      general_location: point,
+    })
+    .eq('profile_id', user.id)
+    .select(`
+      id,
+      profile_id,
+      collector_code,
+      general_location,
+      general_location_text,
+      created_at,
+      updated_at
+    `)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }

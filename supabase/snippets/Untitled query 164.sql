@@ -1,8 +1,7 @@
 SELECT
-    column_name,
-    data_type,
-    is_nullable
-FROM information_schema.columns
-WHERE table_schema = 'public'
-  AND table_name = 'material_lots'
-ORDER BY ordinal_position;
+  collector_code,
+  general_location,
+  general_location_text,
+  updated_at
+FROM public.collectors
+WHERE collector_code = 'KC-22BA72D0';

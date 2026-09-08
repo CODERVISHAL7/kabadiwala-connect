@@ -162,7 +162,7 @@ export default function CollectorProfileScreen({
         <InfoRow
           label="General Location"
           value={
-            collector.general_location ||
+            collector.general_location_text ||
             'Not provided'
           }
         />
@@ -202,6 +202,19 @@ export default function CollectorProfileScreen({
       </View>
 
       {/* Actions */}
+      <Pressable
+        style={styles.primaryButton}
+        onPress={() =>
+            navigation.navigate('EditCollectorProfile', {
+            collector,
+            })
+        }
+        >
+        <Text style={styles.primaryText}>
+            Edit Profile
+        </Text>
+        </Pressable>
+
       <Pressable
         style={styles.primaryButton}
         onPress={() =>
