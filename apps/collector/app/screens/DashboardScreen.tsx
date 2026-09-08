@@ -193,6 +193,17 @@ export default function DashboardScreen({
       </TouchableOpacity>
 
       <TouchableOpacity
+        style={styles.secondaryButton}
+        onPress={() =>
+          navigation.navigate('CollectorProfile')
+        }
+      >
+        <Text style={styles.secondaryButtonText}>
+          My Profile
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={styles.logoutButton}
         onPress={handleLogout}
       >
@@ -200,6 +211,8 @@ export default function DashboardScreen({
           Logout
         </Text>
       </TouchableOpacity>
+
+      
     </View>
   );
 }
