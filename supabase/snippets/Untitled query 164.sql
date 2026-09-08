@@ -6,4 +6,5 @@ SELECT
     cmd
 FROM pg_policies
 WHERE schemaname = 'public'
-  AND tablename = 'material_lots';
+  AND tablename = 'materials'
+ORDER BY policyname;

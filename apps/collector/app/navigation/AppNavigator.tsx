@@ -5,6 +5,7 @@ import {
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import DashboardScreen from '../screens/DashboardScreen';
+import NewCollectionScreen from '../screens/NewCollectionScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,15 +22,25 @@ export default function AppNavigator({
         headerTitleAlign: 'center',
       }}
     >
-      {authenticated ? (
-        <Stack.Screen
-          name="Dashboard"
-          component={DashboardScreen}
-          options={{
-            title: 'Kabadiwala Connect',
-          }}
-        />
-      ) : (
+    {authenticated ? (
+      <>
+      <Stack.Screen
+        name="Dashboard"
+        component={DashboardScreen}
+        options={{
+        title: 'Kabadiwala Connect',
+      }}
+    />
+
+    <Stack.Screen
+      name="NewCollection"
+      component={NewCollectionScreen}
+      options={{
+        title: 'New Collection',
+      }}
+    />
+  </>
+) : (
         <>
           <Stack.Screen
             name="Login"

@@ -25,8 +25,10 @@ type Collector = {
   updated_at: string;
 };
 
-export default function DashboardScreen() {
-  const [collector, setCollector] =
+export default function DashboardScreen({
+  navigation,
+}: any) {
+    const [collector, setCollector] =
     useState<Collector | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -172,10 +174,13 @@ export default function DashboardScreen() {
 
       <TouchableOpacity
         style={styles.primaryButton}
+        onPress={() => navigation.navigate('NewCollection')}
       >
         <Text style={styles.primaryButtonText}>
           + New Collection
+          
         </Text>
+        
       </TouchableOpacity>
 
       <TouchableOpacity
