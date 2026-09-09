@@ -14,12 +14,70 @@ import { supabase } from './lib/supabase';
 
 import AppNavigator from './app/navigation/AppNavigator';
 
+type UserRole =
+  | 'collector'
+  | 'recycler_user'
+  | 'admin';
+
 export default function App() {
   const [sessionReady, setSessionReady] =
     useState(false);
 
   const [authenticated, setAuthenticated] =
     useState(false);
+
+  const [role, setRole] =
+    useState<UserRole | null>(null);
+
+  const [isActive, setIsActive] =
+    useState<boolean | null>(null);
+
+  async function loadUserProfile() {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError) {
+      console.error(
+        'Failed to get authenticated user:',
+        userError
+      );
+
+      setRole(null);
+      setIsActive(null);
+      return;
+    }
+
+    if (!user) {
+      setRole(null);
+      setIsActive(null);
+      return;
+    }
+
+    const {
+      data: profile,
+      error: profileError,
+    } = await supabase
+      .from('profiles')
+      .select('role, is_active')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.error(
+        'Failed to load user profile:',
+        profileError
+      );
+
+      setRole(null);
+      setIsActive(null);
+      return;
+    }
+
+    setRole(profile.role as UserRole);
+    setIsActive(profile.is_active);
+  }
 
   useEffect(() => {
     let mounted = true;
@@ -29,19 +87,47 @@ export default function App() {
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (mounted) {
-        setAuthenticated(!!session);
-        setSessionReady(true);
+      if (!mounted) {
+        return;
       }
+
+      setAuthenticated(!!session);
+
+      if (session) {
+        await loadUserProfile();
+      } else {
+        setRole(null);
+        setIsActive(null);
+      }
+
+      setSessionReady(true);
     }
 
     loadSession();
 
+    const statusInterval = setInterval(() => {
+      if (mounted) {
+        loadUserProfile();
+      }
+    }, 30000);
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
+        if (!mounted) {
+          return;
+        }
+
         setAuthenticated(!!session);
+
+        if (session) {
+          await loadUserProfile();
+        } else {
+          setRole(null);
+          setIsActive(null);
+        }
+
         setSessionReady(true);
       }
     );
@@ -64,6 +150,8 @@ export default function App() {
     <NavigationContainer>
       <AppNavigator
         authenticated={authenticated}
+        role={role}
+        isActive={isActive}
       />
     </NavigationContainer>
   );

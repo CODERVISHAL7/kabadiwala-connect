@@ -102,3 +102,30 @@ export async function getCurrentUser() {
 
   return user;
 }
+
+export async function getCurrentUserStatus() {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    throw userError;
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, role, is_active')
+    .eq('id', user.id)
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
