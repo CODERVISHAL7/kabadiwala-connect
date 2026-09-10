@@ -75,7 +75,12 @@ export async function getMyCollections(): Promise<
     throw error;
   }
 
-  return (data ?? []) as CollectionHistoryItem[];
+return (data ?? []).map((item: any) => ({
+  ...item,
+  material: Array.isArray(item.material)
+    ? item.material[0]
+    : item.material,
+})) as CollectionHistoryItem[];
 }
 
 export async function getCollectionById(

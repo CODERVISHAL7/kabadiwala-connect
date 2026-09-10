@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
+  Text,
   View,
 } from 'react-native';
 
@@ -30,53 +31,73 @@ export default function App() {
     useState<UserRole | null>(null);
 
   const [isActive, setIsActive] =
-    useState<boolean | null>(null);
+  useState<boolean | null>(null);
 
-  async function loadUserProfile() {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+  const [roleLoading, setRoleLoading] =
+    useState(false);
 
-    if (userError) {
-      console.error(
-        'Failed to get authenticated user:',
-        userError
-      );
+  async function loadUserRole() {
+    setRoleLoading(true);
 
-      setRole(null);
-      setIsActive(null);
-      return;
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) {
+        console.error(
+          'Failed to get authenticated user:',
+          userError
+        );
+
+        setRole(null);
+        setIsActive(null);
+        return;
+      }
+
+      if (!user) {
+        setRole(null);
+        setIsActive(null);
+        return;
+      }
+
+      const {
+        data: profile,
+        error: profileError,
+      } = await supabase
+        .from('profiles')
+        .select('role, is_active')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error(
+          'Failed to load user profile:',
+          profileError
+        );
+
+        setRole(null);
+        setIsActive(null);
+        return;
+      }
+
+      if (!profile) {
+        console.warn(
+          'No profile found for authenticated user:',
+          user.id
+        );
+
+        setRole(null);
+        setIsActive(null);
+        return;
+      }
+
+      setRole(profile.role as UserRole);
+      setIsActive(profile.is_active);
+    } finally {
+      setRoleLoading(false);
     }
-
-    if (!user) {
-      setRole(null);
-      setIsActive(null);
-      return;
-    }
-
-    const {
-      data: profile,
-      error: profileError,
-    } = await supabase
-      .from('profiles')
-      .select('role, is_active')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError) {
-      console.error(
-        'Failed to load user profile:',
-        profileError
-      );
-
-      setRole(null);
-      setIsActive(null);
-      return;
-    }
-
-    setRole(profile.role as UserRole);
-    setIsActive(profile.is_active);
   }
 
   useEffect(() => {
@@ -94,22 +115,18 @@ export default function App() {
       setAuthenticated(!!session);
 
       if (session) {
-        await loadUserProfile();
+        await loadUserRole();
       } else {
         setRole(null);
         setIsActive(null);
       }
 
-      setSessionReady(true);
+      if (mounted) {
+        setSessionReady(true);
+      }
     }
 
     loadSession();
-
-    const statusInterval = setInterval(() => {
-      if (mounted) {
-        loadUserProfile();
-      }
-    }, 30000);
 
     const {
       data: { subscription },
@@ -121,14 +138,29 @@ export default function App() {
 
         setAuthenticated(!!session);
 
-        if (session) {
-          await loadUserProfile();
-        } else {
+        if (!session) {
           setRole(null);
           setIsActive(null);
+          setRoleLoading(false);
+          setSessionReady(true);
+          return;
         }
 
-        setSessionReady(true);
+        /*
+         * Small delay prevents the Auth event from
+         * racing the profile INSERT during registration.
+         */
+        setTimeout(async () => {
+          if (!mounted) {
+            return;
+          }
+
+          await loadUserRole();
+
+          if (mounted) {
+            setSessionReady(true);
+          }
+        }, 300);
       }
     );
 
@@ -138,10 +170,52 @@ export default function App() {
     };
   }, []);
 
-  if (!sessionReady) {
+  /*
+   * Initial application loading
+   */
+  if (!sessionReady || roleLoading) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" />
+
+        <Text style={styles.loadingText}>
+          Loading...
+        </Text>
+      </View>
+    );
+  }
+
+  /*
+   * No authenticated user
+   */
+  if (!authenticated) {
+    return (
+      <NavigationContainer>
+        <AppNavigator
+          authenticated={false}
+          role={null}
+          isActive={null}
+        />
+      </NavigationContainer>
+    );
+  }
+
+  /*
+   * Authenticated but profile/role is not
+   * available yet.
+   *
+   * IMPORTANT:
+   * Never render a navigator with authenticated=true
+   * and role=null.
+   */
+  if (!role) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" />
+
+        <Text style={styles.loadingText}>
+          Loading your profile...
+        </Text>
       </View>
     );
   }
@@ -162,5 +236,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
   },
 });

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import {
   Alert,
   StyleSheet,
@@ -10,9 +11,17 @@ import {
 
 import { signIn } from '../../services/auth';
 
-export default function LoginScreen({ navigation }: any) {  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+export default function LoginScreen({
+  navigation,
+}: any) {
+  const [email, setEmail] =
+    useState('');
+
+  const [password, setPassword] =
+    useState('');
+
+  const [loading, setLoading] =
+    useState(false);
 
   async function handleLogin() {
     if (!email || !password) {
@@ -20,22 +29,32 @@ export default function LoginScreen({ navigation }: any) {  const [email, setEma
         'Missing information',
         'Please enter email and password.'
       );
+
       return;
     }
 
     try {
       setLoading(true);
 
-      await signIn(email.trim(), password);
+      await signIn(
+        email.trim(),
+        password
+      );
+
+      // App.tsx / AppNavigator will
+      // automatically route the user
+      // according to their profile role.
+
+    } catch (error: any) {
+      console.error(
+        'Login failed:',
+        error
+      );
 
       Alert.alert(
-        'Success',
-        'You are now logged in.'
-      );
-    } catch (error: any) {
-      Alert.alert(
         'Login failed',
-        error.message
+        error?.message ||
+          'Unable to login.'
       );
     } finally {
       setLoading(false);
@@ -49,7 +68,7 @@ export default function LoginScreen({ navigation }: any) {  const [email, setEma
       </Text>
 
       <Text style={styles.subtitle}>
-        Collector Login
+        Login
       </Text>
 
       <TextInput
@@ -58,6 +77,7 @@ export default function LoginScreen({ navigation }: any) {  const [email, setEma
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
+        autoCorrect={false}
         keyboardType="email-address"
       />
 
@@ -70,19 +90,41 @@ export default function LoginScreen({ navigation }: any) {  const [email, setEma
       />
 
       <TouchableOpacity
-        style={styles.button}
+        style={[
+          styles.button,
+          loading && styles.buttonDisabled,
+        ]}
         onPress={handleLogin}
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading
+            ? 'Logging in...'
+            : 'Login'}
         </Text>
       </TouchableOpacity>
+
       <TouchableOpacity
-        onPress={() => navigation.navigate('Register')}
+        onPress={() =>
+          navigation.navigate(
+            'Register'
+          )
+        }
       >
         <Text style={styles.registerText}>
           Create a new collector account
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() =>
+          navigation.navigate(
+            'RecyclerRegister'
+          )
+        }
+      >
+        <Text style={styles.recyclerRegisterText}>
+          Create a new recycler account
         </Text>
       </TouchableOpacity>
     </View>
@@ -125,15 +167,27 @@ const styles = StyleSheet.create({
     backgroundColor: '#1f7a4d',
   },
 
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+
   buttonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
   },
+
   registerText: {
-  textAlign: 'center',
-  marginTop: 20,
-  fontSize: 16,
-  textDecorationLine: 'underline',
-},
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    textDecorationLine: 'underline',
+  },
+
+  recyclerRegisterText: {
+    textAlign: 'center',
+    marginTop: 16,
+    fontSize: 16,
+    textDecorationLine: 'underline',
+  },
 });

@@ -34,6 +34,16 @@ import AdminCollectorDetailScreen
 import AdminCollectionDetailScreen
   from '../screens/AdminCollectionDetailScreen';
 
+//Recycler screens
+import RecyclerRegisterScreen
+  from '../screens/RecyclerRegisterScreen';
+import RecyclerDashboardScreen
+  from '../screens/RecyclerDashboardScreen';
+import MaterialLotDetailsScreen
+  from '../screens/MaterialLotDetailsScreen';
+import MakeOfferScreen from '../screens/MakeOfferScreen';
+
+
 const Stack = createNativeStackNavigator();
 
 type UserRole =
@@ -162,7 +172,7 @@ export default function AppNavigator({
 
               <Stack.Screen
                 name="CollectionDetails"
-                component={CollectionDetailsScreen}
+                component={CollectionDetailsScreen as any}
                 options={{
                   title: 'Collection Details',
                 }}
@@ -170,7 +180,7 @@ export default function AppNavigator({
 
               <Stack.Screen
                 name="CollectionReview"
-                component={CollectionReviewScreen}
+                component={CollectionReviewScreen as any}
                 options={{
                   title: 'Review Collection',
                 }}
@@ -178,7 +188,7 @@ export default function AppNavigator({
 
               <Stack.Screen
                 name="ConfirmCollection"
-                component={ConfirmCollectionScreen}
+                component={ConfirmCollectionScreen as any}
                 options={{
                   title: 'Confirm Collection',
                 }}
@@ -224,20 +234,49 @@ export default function AppNavigator({
                 }}
               />
             </>
+            /* =========================
+               RECYCLER 
+            ========================== */
 
           ) : role === 'recycler_user' ? (
 
-            /* =========================
-               RECYCLER
-            ========================== */
-
             <>
-              {/* Recycler screens will go here */}
+              <Stack.Screen
+                name="RecyclerDashboard"
+                component={RecyclerDashboardScreen}
+                options={{
+                  title: 'Recycler Dashboard',
+                }}
+              />
+
+              <Stack.Screen
+                name="MaterialLotDetails"
+                component={MaterialLotDetailsScreen as any}
+                options={{
+                  title: 'Material Lot Details',
+                }}
+              />
+
+                  <Stack.Screen
+                    name="MakeOffer"
+                    component={MakeOfferScreen as any}
+                    options={{
+                      title: 'Make Offer',
+                    }}
+                  />
             </>
 
-          ) : null}
-        </>
-      ) : (
+          ) : (
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{
+                title: 'Collector Login',
+              }}
+            />
+          )}
+                  </>
+                ) : (
 
         /* =========================
            AUTHENTICATION
@@ -257,6 +296,14 @@ export default function AppNavigator({
             component={RegisterScreen}
             options={{
               title: 'Create Account',
+            }}
+          />
+
+          <Stack.Screen
+            name="RecyclerRegister"
+            component={RecyclerRegisterScreen}
+            options={{
+              title: 'Recycler Registration',
             }}
           />
         </>
