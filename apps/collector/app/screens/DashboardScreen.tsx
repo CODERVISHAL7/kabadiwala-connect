@@ -173,24 +173,44 @@ export default function DashboardScreen({
       </View>
 
       <TouchableOpacity
-        style={styles.primaryButton}
-        onPress={() => navigation.navigate('NewCollection')}
-      >
-        <Text style={styles.primaryButtonText}>
-          + New Collection
-        </Text>
-      </TouchableOpacity>
+          style={styles.primaryButton}
+          onPress={() => navigation.navigate('NewCollection')}
+        >
+          <Text style={styles.primaryButtonText}>
+            + New Collection
+          </Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.secondaryButton}
-        onPress={() =>
-          navigation.navigate('CollectionHistory')
-  }
-      >
-        <Text style={styles.secondaryButtonText}>
-          Collection History
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.offerButton}
+          onPress={() => navigation.navigate('CollectorOffers')}
+        >
+          <Text style={styles.offerButtonText}>
+            💰 Incoming Offers
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() =>
+            navigation.navigate(
+              'CollectorTransactions'
+            )
+          }
+        >
+          <Text style={styles.secondaryButtonText}>
+            My Transactions
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() => navigation.navigate('CollectionHistory')}
+        >
+          <Text style={styles.secondaryButtonText}>
+            Collection History
+          </Text>
+        </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.secondaryButton}
@@ -363,4 +383,19 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
   },
+
+  offerButton: {
+  borderWidth: 1,
+  borderColor: '#168a4b',
+  borderRadius: 8,
+  paddingVertical: 14,
+  alignItems: 'center',
+  marginBottom: 10,
+},
+
+offerButtonText: {
+  color: '#168a4b',
+  fontSize: 15,
+  fontWeight: '700',
+},
 });

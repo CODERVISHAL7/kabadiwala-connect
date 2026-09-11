@@ -164,3 +164,145 @@ export async function getMyFacilities() {
 
   return facilities ?? [];
 }
+
+export async function getIncomingOffers() {
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error(
+      'GET INCOMING OFFERS AUTH ERROR:',
+      userError
+    );
+
+    throw new Error(userError.message);
+  }
+
+  if (!user) {
+    throw new Error(
+      'You must be logged in to view offers.'
+    );
+  }
+
+  const { data, error } = await supabase
+    .from('offers')
+    .select(`
+      id,
+      lot_id,
+      facility_id,
+      offered_price,
+      price_unit,
+      pickup_available,
+      status,
+      valid_until,
+      created_at,
+      updated_at,
+      material_lots (
+        lot_code,
+        approx_weight,
+        weight_unit,
+        description
+      ),
+      recycler_facilities (
+        facility_code,
+        name,
+        address
+      )
+    `)
+    .order('created_at', {
+      ascending: false,
+    });
+
+  if (error) {
+    console.error(
+      'GET INCOMING OFFERS ERROR:',
+      error
+    );
+
+    throw new Error(
+      `Failed to load offers: ${error.message}`
+    );
+  }
+
+  console.log(
+    'INCOMING OFFERS:',
+    data
+  );
+
+  return data ?? [];
+}
+
+export async function acceptOffer(
+  offerId: string
+) {
+  if (!offerId) {
+    throw new Error('Offer ID is required.');
+  }
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    'accept_offer',
+    {
+      p_offer_id: offerId,
+    }
+  );
+
+  if (error) {
+    console.error(
+      'ACCEPT OFFER ERROR:',
+      error
+    );
+
+    throw new Error(
+      error.message
+    );
+  }
+
+  console.log(
+    'OFFER ACCEPTED:',
+    data
+  );
+
+  return data;
+}
+
+
+export async function rejectOffer(
+  offerId: string
+) {
+  if (!offerId) {
+    throw new Error('Offer ID is required.');
+  }
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    'reject_offer',
+    {
+      p_offer_id: offerId,
+    }
+  );
+
+  if (error) {
+    console.error(
+      'REJECT OFFER ERROR:',
+      error
+    );
+
+    throw new Error(
+      error.message
+    );
+  }
+
+  console.log(
+    'OFFER REJECTED:',
+    data
+  );
+
+  return data;
+}

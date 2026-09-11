@@ -89,6 +89,19 @@ export default function RecyclerDashboardScreen({
         </Text>
       </View>
 
+      <Pressable
+        style={styles.transactionsButton}
+        onPress={() =>
+          navigation.navigate(
+            'RecyclerTransactions'
+          )
+        }
+      >
+        <Text style={styles.transactionsButtonText}>
+          📋 My Transactions
+        </Text>
+      </Pressable>
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>
           Available Material
@@ -320,4 +333,21 @@ const styles = StyleSheet.create({
     color: '#c00',
     textAlign: 'center',
   },
+
+  transactionsButton: {
+  marginHorizontal: 20,
+  marginTop: 16,
+  marginBottom: 4,
+  borderWidth: 1,
+  borderColor: '#168a4b',
+  borderRadius: 8,
+  paddingVertical: 13,
+  alignItems: 'center',
+},
+
+transactionsButtonText: {
+  color: '#168a4b',
+  fontSize: 15,
+  fontWeight: '700',
+},
 });

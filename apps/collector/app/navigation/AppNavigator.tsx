@@ -26,6 +26,12 @@ import CollectionDetailScreen from '../screens/CollectionDetailScreen';
 import CollectorProfileScreen from '../screens/CollectorProfileScreen';
 import EditCollectorProfileScreen from '../screens/EditCollectorProfileScreen';
 
+import CollectorOffersScreen
+  from '../screens/CollectorOffersScreen';
+
+import CollectorTransactionsScreen
+  from '../screens/CollectorTransactionsScreen';
+
 // Admin screens
 import AdminDashboardScreen from '../screens/AdminDashboardScreen';
 import AdminCollectorsScreen from '../screens/AdminCollectorsScreen';
@@ -42,7 +48,8 @@ import RecyclerDashboardScreen
 import MaterialLotDetailsScreen
   from '../screens/MaterialLotDetailsScreen';
 import MakeOfferScreen from '../screens/MakeOfferScreen';
-
+import RecyclerTransactionsScreen
+  from '../screens/RecyclerTransactionsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -163,6 +170,22 @@ export default function AppNavigator({
               />
 
               <Stack.Screen
+                name="CollectorOffers"
+                component={CollectorOffersScreen}
+                options={{
+                  title: 'Incoming Offers',
+                }}
+              />
+
+              <Stack.Screen
+                name="CollectorTransactions"
+                component={CollectorTransactionsScreen}
+                options={{
+                  title: 'My Transactions',
+                }}
+              />
+
+              <Stack.Screen
                 name="NewCollection"
                 component={NewCollectionScreen}
                 options={{
@@ -262,6 +285,14 @@ export default function AppNavigator({
                     component={MakeOfferScreen as any}
                     options={{
                       title: 'Make Offer',
+                    }}
+                  />
+
+                  <Stack.Screen
+                    name="RecyclerTransactions"
+                    component={RecyclerTransactionsScreen}
+                    options={{
+                      title: 'My Transactions',
                     }}
                   />
             </>

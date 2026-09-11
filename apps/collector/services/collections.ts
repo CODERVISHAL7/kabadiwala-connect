@@ -68,7 +68,7 @@ export async function createMaterialLot({
       collection_address: location,
       estimated_value: estimatedValue,
       currency: 'INR',
-      status: 'draft',
+      status: 'available',
     })
     .select()
     .single();
