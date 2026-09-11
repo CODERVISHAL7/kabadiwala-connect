@@ -7,10 +7,14 @@ import {
   ActivityIndicator,
   RefreshControl,
   Pressable,
+  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { getAvailableMaterialLots } from '../../services/recycler';
+
+import { signOut } from '../../services/auth';
+import { supabase } from '../../lib/supabase';
 
 type MaterialLot = {
   id: string;
@@ -59,6 +63,44 @@ export default function RecyclerDashboardScreen({
     loadLots();
   };
 
+async function handleLogout() {
+  try {
+    console.log('RECYCLER LOGOUT: starting...');
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error(
+        'RECYCLER LOGOUT ERROR:',
+        error
+      );
+
+      Alert.alert(
+        'Logout Failed',
+        error.message
+      );
+
+      return;
+    }
+
+    console.log(
+      'RECYCLER LOGOUT: success'
+    );
+
+  } catch (error: any) {
+    console.error(
+      'RECYCLER LOGOUT EXCEPTION:',
+      error
+    );
+
+    Alert.alert(
+      'Logout Failed',
+      error?.message ||
+        'Unable to logout.'
+    );
+  }
+}
+
   return (
     <ScrollView
       style={styles.container}
@@ -70,14 +112,40 @@ export default function RecyclerDashboardScreen({
       }
     >
       <View style={styles.header}>
-        <Text style={styles.title}>
-          Kabadiwala Connect
-        </Text>
+  <View style={styles.headerTop}>
+    <View>
+      <Text style={styles.title}>
+        Kabadiwala Connect
+      </Text>
 
-        <Text style={styles.subtitle}>
-          Recycler Dashboard ♻️
+      <Text style={styles.subtitle}>
+        Recycler Dashboard ♻️
+      </Text>
+    </View>
+
+    <View style={styles.headerActions}>
+      <Pressable
+        style={styles.profileButton}
+        onPress={() =>
+          navigation.navigate('AccountProfile')
+        }
+      >
+        <Text style={styles.profileButtonText}>
+          👤
         </Text>
-      </View>
+      </Pressable>
+
+      <Pressable
+        style={styles.logoutButton}
+        onPress={handleLogout}
+      >
+        <Text style={styles.logoutButtonText}>
+          Logout
+        </Text>
+      </Pressable>
+    </View>
+  </View>
+</View>
 
       <View style={styles.statsCard}>
         <Text style={styles.statsNumber}>
@@ -201,6 +269,48 @@ const styles = StyleSheet.create({
     padding: 28,
     alignItems: 'center',
   },
+
+  headerTop: {
+  width: '100%',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+
+headerActions: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+},
+
+profileButton: {
+  width: 44,
+  height: 44,
+  borderRadius: 22,
+  backgroundColor: '#fff',
+  borderWidth: 1,
+  borderColor: '#ddd',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+profileButtonText: {
+  fontSize: 20,
+},
+
+logoutButton: {
+  paddingHorizontal: 14,
+  paddingVertical: 10,
+  borderRadius: 8,
+  backgroundColor: '#fff',
+  borderWidth: 1,
+  borderColor: '#ddd',
+},
+
+logoutButtonText: {
+  fontSize: 14,
+  fontWeight: '600',
+},
 
   title: {
     fontSize: 28,

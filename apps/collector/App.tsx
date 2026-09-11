@@ -37,31 +37,37 @@ export default function App() {
     useState(false);
 
   async function loadUserRole() {
-    setRoleLoading(true);
+  setRoleLoading(true);
 
-    try {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-      if (userError) {
-        console.error(
-          'Failed to get authenticated user:',
-          userError
-        );
+    if (userError) {
+      console.error(
+        'Failed to get authenticated user:',
+        userError
+      );
 
-        setRole(null);
-        setIsActive(null);
-        return;
-      }
+      setRole(null);
+      setIsActive(null);
+      return;
+    }
 
-      if (!user) {
-        setRole(null);
-        setIsActive(null);
-        return;
-      }
+    if (!user) {
+      setRole(null);
+      setIsActive(null);
+      return;
+    }
 
+    // Retry profile lookup because registration may still
+    // be creating the profile/business records.
+    const maxAttempts = 10;
+    const retryDelay = 500;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       const {
         data: profile,
         error: profileError,
@@ -82,23 +88,35 @@ export default function App() {
         return;
       }
 
-      if (!profile) {
-        console.warn(
-          'No profile found for authenticated user:',
-          user.id
-        );
-
-        setRole(null);
-        setIsActive(null);
+      if (profile) {
+        setRole(profile.role as UserRole);
+        setIsActive(profile.is_active);
         return;
       }
 
-      setRole(profile.role as UserRole);
-      setIsActive(profile.is_active);
-    } finally {
-      setRoleLoading(false);
+      console.warn(
+        `Profile not found for ${user.id}. ` +
+        `Retrying (${attempt}/${maxAttempts})...`
+      );
+
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, retryDelay)
+        );
+      }
     }
+
+    console.error(
+      'Profile was not created after registration:',
+      user.id
+    );
+
+    setRole(null);
+    setIsActive(null);
+  } finally {
+    setRoleLoading(false);
   }
+}
 
   useEffect(() => {
     let mounted = true;

@@ -14,6 +14,9 @@ import {
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 
+import AccountProfileScreen from '../screens/AccountProfileScreen';
+
+
 // Collector screens
 import DashboardScreen from '../screens/DashboardScreen';
 import NewCollectionScreen from '../screens/NewCollectionScreen';
@@ -50,6 +53,9 @@ import MaterialLotDetailsScreen
 import MakeOfferScreen from '../screens/MakeOfferScreen';
 import RecyclerTransactionsScreen
   from '../screens/RecyclerTransactionsScreen';
+import RecyclerTransactionSuccessScreen
+  from '../screens/RecyclerTransactionSuccessScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -126,6 +132,14 @@ export default function AppNavigator({
                 component={AdminDashboardScreen}
                 options={{
                   title: 'Admin Dashboard',
+                }}
+              />
+
+              <Stack.Screen
+                name="AccountProfile"
+                component={AccountProfileScreen}
+                options={{
+                  title: 'My Profile',
                 }}
               />
 
@@ -273,6 +287,14 @@ export default function AppNavigator({
               />
 
               <Stack.Screen
+                name="AccountProfile"
+                component={AccountProfileScreen}
+                options={{
+                  title: 'My Profile',
+                }}
+              />
+
+              <Stack.Screen
                 name="MaterialLotDetails"
                 component={MaterialLotDetailsScreen as any}
                 options={{
@@ -295,6 +317,15 @@ export default function AppNavigator({
                       title: 'My Transactions',
                     }}
                   />
+
+                  <Stack.Screen
+                name="RecyclerTransactionSuccess"
+                component={RecyclerTransactionSuccessScreen}
+                options={{
+                  title: 'Transaction Confirmed',
+                  headerBackVisible: false,
+                }}
+/>
             </>
 
           ) : (

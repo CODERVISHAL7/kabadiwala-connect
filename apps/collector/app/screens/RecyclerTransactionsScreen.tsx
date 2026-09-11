@@ -20,6 +20,7 @@ import {
   confirmTransaction,
   getMyRecyclerTransactions,
   startHandover,
+  completeHandover,
 } from '../../services/recyclerTransactions';
 
 
@@ -56,8 +57,10 @@ type Transaction = {
 };
 
 
-export default function RecyclerTransactionsScreen() {
-  const [transactions, setTransactions] =
+export default function RecyclerTransactionsScreen({
+  navigation,
+}: any) {
+      const [transactions, setTransactions] =
     useState<Transaction[]>([]);
 
   const [loading, setLoading] =
@@ -71,6 +74,18 @@ export default function RecyclerTransactionsScreen() {
 
   const [error, setError] =
     useState<string | null>(null);
+
+ const [handoverTransactionId, setHandoverTransactionId] =
+  useState<string | null>(null);
+
+const [finalWeight, setFinalWeight] =
+  useState('');
+
+const [finalPrice, setFinalPrice] =
+  useState('');
+
+const [processingHandover, setProcessingHandover] =
+  useState(false);
 
 
   const loadTransactions = async () => {
@@ -114,31 +129,52 @@ export default function RecyclerTransactionsScreen() {
 
 
   const handleConfirm = async (
-    transactionId: string
-  ) => {
-    try {
-      setError(null);
-      setProcessingId(transactionId);
+  transactionId: string
+) => {
+  try {
+    setError(null);
+    setProcessingId(transactionId);
 
-      await confirmTransaction(
-        transactionId
+    const confirmedTransaction =
+      await confirmTransaction(transactionId);
+
+    const transaction =
+      transactions.find(
+        (item) => item.id === transactionId
       );
 
-      await loadTransactions();
-    } catch (err: any) {
-      console.error(
-        'Confirm transaction failed:',
-        err
-      );
+    await loadTransactions();
 
-      setError(
-        err?.message ||
-          'Unable to confirm transaction.'
-      );
-    } finally {
-      setProcessingId(null);
-    }
-  };
+    navigation.navigate(
+      'RecyclerTransactionSuccess',
+      {
+        transactionCode:
+          transaction?.transaction_code ||
+          confirmedTransaction?.transaction_code ||
+          transactionId,
+
+        quotedPrice:
+          Number(
+            transaction?.quoted_price ||
+            confirmedTransaction?.quoted_price ||
+            0
+          ),
+      }
+    );
+  } catch (err: any) {
+    console.error(
+      'Confirm transaction failed:',
+      err
+    );
+
+    setError(
+      err?.message ||
+        'Unable to confirm transaction.'
+    );
+  } finally {
+    setProcessingId(null);
+  }
+};
 
   const handleStartHandover = async (
   transactionId: string
@@ -162,6 +198,54 @@ export default function RecyclerTransactionsScreen() {
     );
   } finally {
     setProcessingId(null);
+  }
+};
+
+const handleCompleteHandover = async () => {
+  if (!handoverTransactionId) {
+    return;
+  }
+
+  const weight = Number(finalWeight);
+  const price = Number(finalPrice);
+
+  if (!Number.isFinite(weight) || weight <= 0) {
+    setError('Please enter a valid final weight.');
+    return;
+  }
+
+  if (!Number.isFinite(price) || price < 0) {
+    setError('Please enter a valid final price.');
+    return;
+  }
+
+  try {
+    setError(null);
+    setProcessingHandover(true);
+
+    await completeHandover(
+      handoverTransactionId,
+      weight,
+      price
+    );
+
+    setHandoverTransactionId(null);
+    setFinalWeight('');
+    setFinalPrice('');
+
+    await loadTransactions();
+  } catch (err: any) {
+    console.error(
+      'Complete handover failed:',
+      err
+    );
+
+    setError(
+      err?.message ||
+        'Unable to complete handover.'
+    );
+  } finally {
+    setProcessingHandover(false);
   }
 };
 
@@ -196,8 +280,10 @@ export default function RecyclerTransactionsScreen() {
       </Text>
 
       <Text style={styles.subtitle}>
-        Transactions created from your accepted offers
-      </Text>
+            {transactions.length} transaction
+            {transactions.length !== 1 ? 's' : ''} from your
+            accepted offers
+        </Text>
 
 
       {error && (

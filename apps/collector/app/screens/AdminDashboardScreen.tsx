@@ -5,14 +5,19 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
+  Pressable,
   Text,
   View,
+  Alert,
 } from 'react-native';
+
+import { supabase } from '../../lib/supabase';
 
 import { useFocusEffect } from '@react-navigation/native';
 
 import { getAdminStats } from '../../services/admin';
 
+import { signOut } from '../../services/auth';
 
 type AdminStats = {
   collectors: number;
@@ -38,7 +43,7 @@ export default function AdminDashboardScreen({ navigation }: any) {  const [stat
     try {
       setError(null);
 
-      const data = await getAdminStats();
+    const data = await getAdminStats();
 
       setStats(data);
     } catch (err: any) {
@@ -67,6 +72,45 @@ export default function AdminDashboardScreen({ navigation }: any) {  const [stat
     setRefreshing(true);
     loadStats();
   };
+
+ async function handleLogout() {
+  try {
+    console.log('ADMIN LOGOUT: starting...');
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error(
+        'ADMIN LOGOUT ERROR:',
+        error
+      );
+
+      Alert.alert(
+        'Logout Failed',
+        error.message
+      );
+
+      return;
+    }
+
+    console.log(
+      'ADMIN LOGOUT: success'
+    );
+
+  } catch (error: any) {
+    console.error(
+      'ADMIN LOGOUT EXCEPTION:',
+      error
+    );
+
+    Alert.alert(
+      'Logout Failed',
+      error?.message ||
+        'Unable to logout.'
+    );
+  }
+}
+
 
   if (loading) {
     return (
@@ -100,7 +144,28 @@ export default function AdminDashboardScreen({ navigation }: any) {  const [stat
           Welcome, Admin 🛡️
         </Text>
       </View>
+      
+      <View style={styles.headerActions}>
+      <Pressable
+        style={styles.profileButton}
+        onPress={() =>
+          navigation.navigate('AccountProfile')
+        }
+      >
+        <Text style={styles.profileButtonText}>
+          👤
+        </Text>
+      </Pressable>
 
+      <Pressable
+        style={styles.logoutButton}
+        onPress={handleLogout}
+      >
+        <Text style={styles.logoutButtonText}>
+          Logout
+        </Text>
+      </Pressable>
+         </View>
       {error && (
         <View style={styles.errorBox}>
           <Text style={styles.errorText}>
@@ -206,6 +271,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
   },
+
+  headerTop: {
+  width: '100%',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+
+headerActions: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+},
+
+profileButton: {
+  width: 44,
+  height: 44,
+  borderRadius: 22,
+  backgroundColor: '#fff',
+  borderWidth: 1,
+  borderColor: '#ddd',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+profileButtonText: {
+  fontSize: 20,
+},
+
+logoutButton: {
+  paddingHorizontal: 14,
+  paddingVertical: 10,
+  borderRadius: 8,
+  backgroundColor: '#fff',
+  borderWidth: 1,
+  borderColor: '#ddd',
+},
+
+logoutButtonText: {
+  fontSize: 14,
+  fontWeight: '600',
+},
 
   title: {
     fontSize: 24,

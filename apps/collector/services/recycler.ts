@@ -25,9 +25,7 @@ export async function registerRecycler(
       authError
     );
 
-    throw new Error(
-      authError.message
-    );
+    throw new Error(authError.message);
   }
 
   if (!authData.user) {
@@ -36,30 +34,45 @@ export async function registerRecycler(
     );
   }
 
-  const userId = authData.user.id;
+  /*
+   * Supabase may return a session immediately after
+   * signup. Wait until the authenticated session is
+   * available before calling the registration RPC.
+   */
+  if (!authData.session) {
+    throw new Error(
+      'Registration requires email confirmation. Please confirm your email and then log in.'
+    );
+  }
 
   const {
-    error: profileError,
-  } = await supabase
-    .from('profiles')
-    .insert({
-      id: userId,
-      role: 'recycler_user',
-      preferred_language:
+    data: recyclerData,
+    error: recyclerError,
+  } = await supabase.rpc(
+    'register_recycler',
+    {
+      p_name: operatingLocation.trim(),
+      p_email: email.trim(),
+      p_preferred_language:
         preferredLanguage || 'hi',
-      is_active: true,
-    });
+    }
+  );
 
-  if (profileError) {
+  if (recyclerError) {
     console.error(
-      'RECYCLER PROFILE INSERT ERROR:',
-      profileError
+      'RECYCLER BUSINESS PROFILE ERROR:',
+      recyclerError
     );
 
     throw new Error(
-      `Profile creation failed: ${profileError.message}`
+      `Recycler setup failed: ${recyclerError.message}`
     );
   }
+
+  console.log(
+    'RECYCLER REGISTRATION SUCCESS:',
+    recyclerData
+  );
 
   return authData.user;
 }

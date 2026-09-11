@@ -136,3 +136,61 @@ export async function startHandover(
 
   return data;
 }
+
+export async function completeHandover(
+  transactionId: string,
+  finalWeight: number,
+  finalPrice: number
+) {
+  if (!transactionId) {
+    throw new Error(
+      'Transaction ID is required.'
+    );
+  }
+
+  if (
+    !Number.isFinite(finalWeight) ||
+    finalWeight <= 0
+  ) {
+    throw new Error(
+      'Final weight must be greater than 0.'
+    );
+  }
+
+  if (
+    !Number.isFinite(finalPrice) ||
+    finalPrice < 0
+  ) {
+    throw new Error(
+      'Final price cannot be negative.'
+    );
+  }
+
+  const {
+    data,
+    error,
+  } = await supabase.rpc(
+    'complete_handover',
+    {
+      p_transaction_id: transactionId,
+      p_final_weight: finalWeight,
+      p_final_price: finalPrice,
+    }
+  );
+
+  if (error) {
+    console.error(
+      'COMPLETE HANDOVER ERROR:',
+      error
+    );
+
+    throw new Error(error.message);
+  }
+
+  console.log(
+    'HANDOVER COMPLETED:',
+    data
+  );
+
+  return data;
+}
